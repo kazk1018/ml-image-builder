@@ -1,0 +1,5 @@
+- name: install development packages
+  apt:
+    name: ['git', 'tmux', 'vim']
+    state: present
+    update_cache: yes

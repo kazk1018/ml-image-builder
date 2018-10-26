@@ -1,0 +1,9 @@
+- hosts: all
+  user: ubuntu
+  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  roles:
+    - dev
+    - docker
+    - gpu

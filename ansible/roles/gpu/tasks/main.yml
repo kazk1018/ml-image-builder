@@ -1,0 +1,39 @@
+- name: install nvidia-driver
+  apt:
+    name: nvidia-driver-{{ nvidia_driver_version }}
+    state: present
+    update_cache: true
+
+- name: docker clean for nvidia-docker v1
+  shell: "docker volume ls -q -f driver=nvidia-docker | xargs -r -I{} -n1 docker ps -q -a -f volume={} | xargs -r docker rm -f"
+
+- name: uninstall nvidia-docker v1
+  apt:
+    name: nvidia-docker
+    state: absent
+
+- name: Add nvidia-docker's repository key
+  apt_key:
+    url: https://nvidia.github.io/nvidia-docker/gpgkey
+    state: present
+  register: add_repository_key
+
+- name: add nvida-docker’s GPG key
+  shell: "curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -"
+  when: add_repository_key is failed
+
+- name: add nvidia-docker repository source
+  get_url:
+    url: https://nvidia.github.io/nvidia-docker/{{ ansible_distribution|lower }}{{ ansible_distribution_version }}/nvidia-docker.list
+    dest: /etc/apt/sources.list.d/nvidia-docker.list
+
+- name: install nvidia-docker2
+  apt:
+    name: nvidia-docker2
+    state: present
+    update_cache: true
+
+- name: reload docker configuration
+  service:
+    name: docker
+    state: reloaded

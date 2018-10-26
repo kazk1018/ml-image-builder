@@ -1,0 +1,33 @@
+{
+    "variables": {
+        "project_id": "{{env `PROJECT_ID`}}",
+        "zone": "asia-east1-c",
+        "account_file": "{{env `GOOGLE_APPLICATION_CREDENTIALS`}}",
+        "machine_type": "n1-standard-1",
+        "accelerator_type": "nvidia-tesla-p100",
+        "accelerator_count": "1",
+        "disk_size": "10"
+    },
+    "builders": [
+        {
+            "type": "googlecompute",
+            "source_image_family": "ubuntu-1804-lts",
+            "project_id": "{{user `project_id`}}",
+            "zone": "{{user `zone`}}",
+            "ssh_username": "packer",
+            "account_file": "{{user `account_file`}}",
+            "image_name": "ml-gpu-{{timestamp}}",
+            "machine_type": "{{user `machine_type`}}",
+            "accelerator_type": "projects/{{user `project_id`}}/zones/{{user `zone`}}/acceleratorTypes/{{user `accelerator_type`}}",
+            "accelerator_count": "{{user `accelerator_count`}}",
+            "on_host_maintenance": "TERMINATE",
+            "disk_size": "{{user `disk_size`}}"
+        }
+    ],
+    "provisioners": [
+        {
+          "type": "ansible",
+          "playbook_file": "ansible/site.yml"
+        }
+    ]
+}
